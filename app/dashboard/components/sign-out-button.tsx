@@ -1,5 +1,3 @@
-'use server';
-
 import { signOut } from "@/lib/auth"
 import Button from "next/link"
 
