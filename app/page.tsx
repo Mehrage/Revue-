@@ -1,15 +1,14 @@
-import {
-  GitPullRequest,
-  ArrowRight,
-  Github,
-} from "lucide-react";
+import { GitPullRequest, ArrowRight, Github } from "lucide-react";
 import Link from "next/link";
+import { AuroraBackground } from "@/components/aurora-background";
+import { ReviewDemo } from "@/components/review-demo";
+import { FadeIn } from "@/components/fade-in";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 antialiased selection:bg-neutral-800">
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-900 via-neutral-950 to-neutral-950 -z-10" />
-      
+    <div className="min-h-screen text-neutral-100 antialiased selection:bg-neutral-800">
+      <AuroraBackground />
+
       <nav className="fixed top-0 w-full z-50 bg-neutral-950/80 backdrop-blur-md border-b border-neutral-800/50">
         <div className="max-w-3xl mx-auto px-6">
           <div className="flex justify-between items-center h-14">
@@ -29,79 +28,62 @@ export default function Home() {
         </div>
       </nav>
 
-      <section className="pt-36 pb-28 px-6">
+      {/* Hero */}
+      <section className="pt-36 pb-28 px-6 relative">
         <div className="max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-neutral-900 border border-neutral-800 rounded-full text-xs text-neutral-400 mb-8">
-            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-            Now in public beta
-          </div>
-          <h1 className="text-4xl sm:text-5xl font-medium tracking-tight leading-[1.15] mb-6">
-            Better pull requests,
-            <br />
-            <span className="text-neutral-500">less review time.</span>
-          </h1>
-          <p className="text-lg text-neutral-400 leading-relaxed mb-12 max-w-md">
-            Revue reviews your PRs instantly—catching bugs, suggesting improvements, 
-            and helping your team ship faster.
-          </p>
-          <div className="flex items-center gap-5">
-            <Link
-              href="/api/auth/signin"
-              className="group inline-flex items-center gap-2.5 px-5 py-2.5 text-sm font-medium bg-neutral-100 text-neutral-900 rounded-lg hover:bg-white transition-all duration-200 shadow-sm shadow-neutral-900"
-            >
-              <Github className="w-4 h-4" />
-              Get started
-              <ArrowRight className="w-3.5 h-3.5 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200" />
-            </Link>
-            <Link
-              href="#how"
-              className="text-sm text-neutral-500 hover:text-neutral-300 transition-colors duration-200"
-            >
-              See how it works
-            </Link>
-          </div>
+          <FadeIn delay={0}>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-neutral-900/80 backdrop-blur-sm border border-neutral-800 rounded-full text-xs text-neutral-400 mb-8">
+              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+              Now in public beta
+            </div>
+          </FadeIn>
+
+          <FadeIn delay={0.1}>
+            <h1 className="text-4xl sm:text-5xl font-medium tracking-tight leading-[1.15] mb-6">
+              Better pull requests,
+              <br />
+              <span className="text-neutral-500">less review time.</span>
+            </h1>
+          </FadeIn>
+
+          <FadeIn delay={0.2}>
+            <p className="text-lg text-neutral-400 leading-relaxed mb-12 max-w-md">
+              Revue reviews your PRs instantly—catching bugs, suggesting
+              improvements, and helping your team ship faster.
+            </p>
+          </FadeIn>
+
+          <FadeIn delay={0.3}>
+            <div className="flex items-center gap-5">
+              {/* Shimmer CTA */}
+              <Link
+                href="/api/auth/signin"
+                className="group relative inline-flex items-center gap-2.5 px-5 py-2.5 text-sm font-medium bg-neutral-100 text-neutral-900 rounded-lg hover:bg-white hover:shadow-lg hover:shadow-neutral-100/10 transition-all duration-300 shadow-sm shadow-neutral-900 overflow-hidden"
+              >
+                <span className="absolute inset-0 animate-shimmer opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <Github className="w-4 h-4 relative z-10" />
+                <span className="relative z-10">Get started</span>
+                <ArrowRight className="w-3.5 h-3.5 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200 relative z-10" />
+              </Link>
+              <Link
+                href="#how"
+                className="text-sm text-neutral-500 hover:text-neutral-300 transition-colors duration-200"
+              >
+                See how it works
+              </Link>
+            </div>
+          </FadeIn>
         </div>
       </section>
 
+      {/* Live review demo */}
       <section id="how" className="py-24 px-6">
         <div className="max-w-3xl mx-auto">
-          <div className="relative">
-            <div className="absolute -inset-px bg-gradient-to-b from-neutral-800 to-neutral-900 rounded-xl blur-sm opacity-50" />
-            <div className="relative border border-neutral-800 rounded-xl overflow-hidden bg-neutral-950">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-800/80 bg-neutral-900/30">
-                <span className="text-xs text-neutral-500 font-mono">payment.ts</span>
-                <div className="flex gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-neutral-800" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-neutral-800" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-neutral-800" />
-                </div>
-              </div>
-              <div className="p-6 font-mono text-sm leading-7">
-                <div className="text-neutral-500">
-                  <span className="text-neutral-400">function</span>{" "}
-                  <span className="text-neutral-200">processPayment</span>
-                  <span className="text-neutral-600">(amount) {"{"}</span>
-                </div>
-                <div className="text-neutral-500 pl-6">
-                  <span className="text-neutral-400">const</span> tax = amount * <span className="text-amber-400/80">0.1</span>;
-                </div>
-                <div className="my-4 ml-6 py-3 px-4 bg-neutral-900/80 rounded-lg border border-neutral-800/80">
-                  <p className="text-neutral-300 text-xs leading-relaxed">
-                    <span className="text-emerald-400/90 font-medium">revue</span>
-                    <span className="text-neutral-600 mx-2">·</span>
-                    Magic number detected. Extract <code className="text-amber-400/80 bg-neutral-800/50 px-1.5 py-0.5 rounded">0.1</code> to a named constant.
-                  </p>
-                </div>
-                <div className="text-neutral-500 pl-6">
-                  <span className="text-neutral-400">return</span> amount + tax;
-                </div>
-                <div className="text-neutral-600">{"}"}</div>
-              </div>
-            </div>
-          </div>
+          <ReviewDemo />
         </div>
       </section>
 
+      {/* Features */}
       <section className="py-24 px-6">
         <div className="max-w-3xl mx-auto">
           <div className="grid sm:grid-cols-3 gap-8 sm:gap-12">
@@ -118,28 +100,38 @@ export default function Home() {
                 title: "GitHub native",
                 desc: "Works in your existing workflow. No new tools.",
               },
-            ].map((f) => (
-              <div key={f.title}>
-                <h3 className="text-neutral-100 font-medium mb-2">{f.title}</h3>
-                <p className="text-sm text-neutral-500 leading-relaxed">{f.desc}</p>
-              </div>
+            ].map((f, i) => (
+              <FadeIn key={f.title} delay={i * 0.1} direction="up">
+                <div className="group hover:translate-y-[-2px] transition-transform duration-300">
+                  <h3 className="text-neutral-100 font-medium mb-2 group-hover:text-white transition-colors">
+                    {f.title}
+                  </h3>
+                  <p className="text-sm text-neutral-500 leading-relaxed group-hover:text-neutral-400 transition-colors">
+                    {f.desc}
+                  </p>
+                </div>
+              </FadeIn>
             ))}
           </div>
         </div>
       </section>
 
+      {/* Bottom CTA */}
       <section className="py-28 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="text-sm text-neutral-600 mb-5">Free while in beta</p>
-          <Link
-            href="/api/auth/signin"
-            className="group inline-flex items-center gap-2.5 px-6 py-3 text-sm font-medium bg-neutral-100 text-neutral-900 rounded-lg hover:bg-white transition-all duration-200 shadow-sm shadow-neutral-900"
-          >
-            <Github className="w-4 h-4" />
-            Connect your repository
-            <ArrowRight className="w-3.5 h-3.5 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200" />
-          </Link>
-        </div>
+        <FadeIn direction="up">
+          <div className="max-w-3xl mx-auto text-center">
+            <p className="text-sm text-neutral-600 mb-5">Free while in beta</p>
+            <Link
+              href="/api/auth/signin"
+              className="group relative inline-flex items-center gap-2.5 px-6 py-3 text-sm font-medium bg-neutral-100 text-neutral-900 rounded-lg hover:bg-white hover:shadow-lg hover:shadow-neutral-100/10 transition-all duration-300 shadow-sm shadow-neutral-900 overflow-hidden"
+            >
+              <span className="absolute inset-0 animate-shimmer opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <Github className="w-4 h-4 relative z-10" />
+              <span className="relative z-10">Connect your repository</span>
+              <ArrowRight className="w-3.5 h-3.5 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200 relative z-10" />
+            </Link>
+          </div>
+        </FadeIn>
       </section>
 
       <footer className="py-8 px-6 border-t border-neutral-900">
