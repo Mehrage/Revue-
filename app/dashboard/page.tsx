@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import { SignOutButton } from "./components/sign-out-button"
 import { GitPullRequest, ChevronRight, GitBranch, Clock, CheckCircle2, Circle } from "lucide-react"
 import Link from "next/link"
 
@@ -113,12 +114,7 @@ export default async function DashboardPage() {
             <h1 className="text-sm font-medium text-neutral-100">my-app</h1>
             <p className="text-xs text-neutral-500">3 open pull requests</p>
           </div>
-          <Link
-            href="/api/auth/signout"
-            className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors"
-          >
-            Sign out
-          </Link>
+          <SignOutButton />
         </div>
 
         {/* PR list */}
