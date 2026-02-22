@@ -1,5 +1,4 @@
 import { signOut } from "@/lib/auth"
-import Button from "next/link"
 
 export async function SignOutButton() {
     return (

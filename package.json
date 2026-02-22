@@ -20,6 +20,7 @@
     "lucide-react": "^0.575.0",
     "next": "16.1.6",
     "next-auth": "^5.0.0-beta.30",
+    "octokit-fetch-all-repos": "^2.0.3",
     "pg": "^8.18.0",
     "prisma": "^7.4.1",
     "radix-ui": "^1.4.3",

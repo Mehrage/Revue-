@@ -1,6 +1,8 @@
 import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { SignOutButton } from "./components/sign-out-button"
+import { Octokit } from "@octokit/rest"
+import { prisma } from "@/lib/prisma"
 import {
   GitPullRequest,
   ChevronRight,
@@ -80,6 +82,34 @@ export default async function DashboardPage() {
   const session = await auth()
   if (!session) redirect("/")
 
+
+  const account = await prisma.account.findFirst({
+    where: { 
+      userId: session?.user?.id, 
+      provider: "github"
+    },
+  })
+
+  const octokit = new Octokit({
+    auth: account?.access_token,
+  })
+
+  const { data: repos } = await octokit.rest.repos.listForAuthenticatedUser({
+    type: "owner",
+  })
+  console.log("Fetched repos:", repos.length)
+  for (const repo of repos) {
+    console.log(`Repo: ${repo.full_name} (ID: ${repo.id})`)
+    
+    const { data: prs } = await octokit.rest.pulls.list({
+      owner: repo.owner.login,
+      repo: repo.name,
+      state: "open",
+    })
+    console.log(`  Open PRs: ${prs.length}`)
+  }
+
+
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 flex">
 
@@ -108,7 +138,7 @@ export default async function DashboardPage() {
             Repositories
           </p>
           <nav className="space-y-0.5 px-2">
-            {PLACEHOLDER_REPOS.map((repo, i) => (
+            {repos.map((repo, i) => (
               <button
                 key={repo.id}
                 className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-all duration-150 ${
