@@ -3,8 +3,13 @@ import Link from "next/link";
 import { AuroraBackground } from "@/components/aurora-background";
 import { ReviewDemo } from "@/components/review-demo";
 import { FadeIn } from "@/components/fade-in";
+import { auth } from "@/lib/auth";
+import { redirect } from 'next/navigation'
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth()
+  if (session) { redirect("/dashboard") }
+
   return (
     <div className="min-h-screen text-neutral-100 antialiased selection:bg-neutral-800">
       <AuroraBackground />
