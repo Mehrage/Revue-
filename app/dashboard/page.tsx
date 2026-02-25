@@ -151,13 +151,6 @@ export default async function DashboardPage() {
                   <GitBranch className="w-3.5 h-3.5 shrink-0 text-neutral-500" />
                   <span className="truncate text-sm">{repo.name}</span>
                 </div>
-                {repo.prs > 0 && (
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full shrink-0 font-medium ${
-                    i === 0 ? "bg-neutral-700 text-neutral-300" : "bg-neutral-800 text-neutral-500"
-                  }`}>
-                    {repo.prs}
-                  </span>
-                )}
               </button>
             ))}
           </nav>
