@@ -93,10 +93,10 @@ export default async function DashboardPage() {
   })
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-neutral-100 flex">
+    <div className="h-screen bg-[#0a0a0f] text-neutral-100 flex overflow-hidden">
 
       {/* Sidebar */}
-      <aside className="w-64 flex flex-col shrink-0 border-r border-white/5">
+      <aside className="w-64 h-full flex flex-col shrink-0 border-r border-white/5">
 
         {/* Logo */}
         <div className="h-16 flex items-center gap-3 px-5 border-b border-white/5">
@@ -169,7 +169,7 @@ export default async function DashboardPage() {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 flex flex-col min-w-0">
+      <main className="flex-1 flex flex-col min-w-0 h-full">
 
         {/* Topbar */}
         <div className="h-16 border-b border-white/5 flex items-center justify-between px-8 shrink-0">
