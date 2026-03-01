@@ -69,7 +69,7 @@ export function ReviewDemo() {
             className="text-neutral-500 pl-6"
           >
             <span className="text-neutral-400">const</span> tax = amount *{" "}
-            <span className="text-amber-400/80">0.1</span>;
+            <span style={{ color: "#c4994a" }}>0.1</span>;
           </motion.div>
 
           {/* Review comment — animates in, then types */}
@@ -79,13 +79,13 @@ export function ReviewDemo() {
             transition={{ duration: 0.35, delay: 0.35 }}
             className="ml-6 overflow-hidden"
           >
-            <div className="py-3 px-4 bg-neutral-900/80 rounded-lg border border-emerald-500/20">
+            <div className="py-3 px-4 bg-neutral-900/80 rounded-lg border border-[#c4994a]/18">
               <p className="text-neutral-300 text-xs leading-relaxed min-h-[1.5rem]">
-                <span className="text-emerald-400/90 font-medium">revue</span>
-                <span className="text-neutral-600 mx-2">·</span>
+                <span className="font-medium" style={{ color: "#c4994a" }}>revue</span>
+                <span className="text-neutral-700 mx-2">·</span>
                 {displayedText}
                 {showCursor && !isDone && (
-                  <span className="inline-block w-[2px] h-[12px] bg-emerald-400/70 ml-[1px] align-middle animate-pulse" />
+                  <span className="inline-block w-[2px] h-[12px] ml-[1px] align-middle animate-pulse" style={{ background: "rgba(196,153,74,0.7)" }} />
                 )}
               </p>
             </div>
