@@ -9,6 +9,8 @@ import {
   Clock, CheckCircle2, Circle, Sparkles, Search, Zap,
 } from "lucide-react"
 import { ReviewPrButton } from "./components/review-pr-button"
+import ReviewAccordion from "./components/review-accordion"
+import { DeleteReviewButton } from "./components/delete-button"
 
 const GOLD = "#c4994a"
 const GOLD_DIM = "rgba(196,153,74,0.08)"
@@ -47,24 +49,29 @@ export default async function RepoDashboardPage({ params }: { params: Promise<{ 
   })
 
   
-      const dbReviews = await prisma.review.findMany({
-        where: { 
-          repoName: repoName,
-          userId: session.user?.id 
-        }
-      })
+    const dbReviews = await prisma.review.findMany({
+      where: { repoName: repoName, userId: session.user.id }
+      });
 
       
-      const prs = pulls.map((pr) => ({
-        id: pr.id,
-        number: pr.number,
-        title: pr.title,
-        branch: pr.head.ref,
-        updatedAt: new Date(pr.updated_at).toLocaleDateString(),
-        labels: pr.labels.map((l) => l.name ?? "chore"),
-        
-        reviewed: dbReviews.some(rev => rev.prNumber === pr.number),
-      }))
+      const prs = pulls.map((pr) => {
+        // Find the full review object from the database
+        const dbReview = dbReviews.find(rev => rev.prNumber === pr.number);
+      
+        return {
+          id: pr.id,
+          number: pr.number,
+          title: pr.title,
+          branch: pr.head.ref,
+          updatedAt: new Date(pr.updated_at).toLocaleDateString(),
+          labels: pr.labels.map((l) => l.name ?? "chore"),
+          
+          // Pass the actual data along
+          reviewed: !!dbReview,
+          reviewContent: dbReview?.content || "",
+          reviewMermaid: dbReview?.mermaid || "",
+        }
+      })
 
   const pendingCount = prs.filter((p) => !p.reviewed).length
   const reviewedCount = prs.filter((p) => p.reviewed).length
@@ -152,21 +159,23 @@ export default async function RepoDashboardPage({ params }: { params: Promise<{ 
               ) : prs.map((pr) => {
                 const label = pr.labels[0]
                 const style = LABEL_STYLES[label] ?? LABEL_STYLES.chore
+                
                 return (
                   <div key={pr.id} className="flex flex-col px-5 py-4 rounded-xl transition-all duration-150 w-full min-w-0 overflow-hidden"
                     style={{ border: "1px solid rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.018)" }}>
 
-                    {/* PR info row */}
+                    {/* Row 1: The PR Header Info & Actions */}
                     <div className="flex flex-wrap items-center gap-4 min-w-0">
                       <div className="shrink-0">
                         {pr.reviewed
                           ? <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                           : <Circle className="w-4 h-4" style={{ color: "#2a2d3a" }} />}
                       </div>
+                      
                       <div className="flex-1 min-w-0 space-y-2">
                         <div className="flex items-center gap-2.5">
                           <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${style.dot}`} />
-                          <p className="text-sm font-medium truncate text-[#c0c3d4] group-hover:text-[#e6e8f0] transition-colors">{pr.title}</p>
+                          <p className="text-sm font-medium truncate text-[#c0c3d4]">{pr.title}</p>
                           <span className={`shrink-0 text-[10px] px-2 py-0.5 rounded-full font-medium ${style.bg} ${style.text}`}>{label}</span>
                         </div>
                         <div className="flex items-center gap-2.5 text-xs" style={{ color: "#3a3d50" }}>
@@ -178,15 +187,25 @@ export default async function RepoDashboardPage({ params }: { params: Promise<{ 
                         </div>
                       </div>
                       
-                      {pr.reviewed ? (
-                        <div className="shrink-0 ml-auto flex items-center gap-1.5 text-xs font-medium" style={{ color: "rgba(52,211,153,0.5)" }}>
-                          <Sparkles className="w-3 h-3" />Reviewed
-                        </div>
-                      ) : (
-                        <ReviewPrButton owner={owner} repo={repoName} prNumber={pr.number} />
-                      )}
+                      {/* Action Area: Show Delete if reviewed, else show Review button */}
+                      <div className="shrink-0 ml-auto flex items-center gap-2">
+                        {pr.reviewed ? (
+                          <DeleteReviewButton prNumber={pr.number} repoName={repoName} />
+                        ) : (
+                          <ReviewPrButton owner={owner} repo={repoName} prNumber={pr.number} />
+                        )}
+                      </div>
                     </div>
 
+                    {/* Row 2: The Accordion (Only appears if reviewed) */}
+                    {pr.reviewed && (
+                      <div className="w-full mt-2">
+                        <ReviewAccordion 
+                          content={pr.reviewContent} 
+                          mermaid={pr.reviewMermaid} 
+                        />
+                      </div>
+                    )}
                   </div>
                 )
               })}

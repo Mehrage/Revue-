@@ -1,75 +1,83 @@
-import { WatsonXAI } from "@ibm-cloud/watsonx-ai";
-import { IamAuthenticator } from "ibm-cloud-sdk-core";
-
-const REVIEW_SYSTEM_PROMPT = `You are an expert code reviewer. Review the following pull request diff and provide a concise, actionable code review.`;
+import OpenAI from "openai";
 
 export type ReviewInput = {
   diff: string;
   prTitle: string;
   prBody?: string | null;
 };
+
 export type ReviewOutput = {
   summary: string;
   mermaid: string;
-}
+};
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || "test", 
+  baseURL: "https://vjioo4r1vyvcozuj.us-east-2.aws.endpoints.huggingface.cloud/v1",
+});
 
 export async function generateReview(input: ReviewInput): Promise<ReviewOutput> {
-  const apiKey = process.env.WATSONX_API_KEY;
-  const projectId = process.env.WATSONX_PROJECT_ID;
-  const url = process.env.WATSONX_URL;
+  const systemPrompt = `You are a cold, robotic code analysis tool. 
+- NO greetings or conversational text. 
+- BE EXTREMELY CONCISE. You are limited to ONE short bullet point per category.
+- If a category has no issues, write "None."
+- STOP immediately after the closing \`\`\` of the mermaid diagram.
 
-  if (!apiKey || !projectId || !url) {
-    throw new Error("Missing WATSONX_API_KEY, WATSONX_PROJECT_ID, or WATSONX_URL");
-  }
+Template:
+- Bugs: [Max 1 short sentence]
+- Security: [Max 1 short sentence]
+- Style: [Max 1 short sentence]
+- Performance: [Max 1 short sentence]
+- Tests: [Max 1 short sentence]
+- Suggestions: [Max 2 short bullet points]
 
-  const watsonx = new WatsonXAI({
-    version: "2024-05-31",
-    serviceUrl: url,
-    authenticator: new IamAuthenticator({ apikey: apiKey }),
+\`\`\`mermaid
+[diagram]
+\`\`\``;
+
+  const userPrompt = `PR: ${input.prTitle}\nDiff:\n${input.diff.slice(0, 50000)}`;
+
+  const response = await client.chat.completions.create({
+    model: "openai/gpt-oss-120b", 
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ],
+    max_tokens: 800,
+    temperature: 0.1,
+    // ✅ FIX 1: Tell the API to stop if it tries to start a polite sentence
+    stop: ["Let me know", "I hope this", "###", "Note:"], 
   });
 
-  const response = await watsonx.generateText({
-    input: `You are an expert code reviewer. Review this pull request and be concise and direct.
+  let text = response.choices[0]?.message?.content || "";
+  if (!text) throw new Error("The model returned no text");
 
-PR: ${input.prTitle}
-${input.prBody ? `Description: ${input.prBody}` : ""}
-
-Diff:
-\`\`\`diff
-${input.diff.slice(0, 90000)}
-\`\`\`
-
-Provide feedback in these exact sections:
-- Bugs and logic errors
-- Security issues
-- Code style and maintainability
-- Performance concerns
-- Missing tests or error handling
-- Suggestions for improvement
-
-If a section has nothing to report, write "None."
-
-CRITICAL: At the very end of your response, you MUST include a Mermaid.js flowchart illustrating the architecture, logic, or flow of the changes. Wrap the flowchart strictly inside \`\`\`mermaid and \`\`\` tags. DO NOT output JSON. Write plain text only.`,
-    modelId: "meta-llama/llama-3-3-70b-instruct",
-    projectId,
-    parameters: {
-      max_new_tokens: 800, // Bumped this slightly so it has room to draw the graph
-      temperature: 0.3,
-      // Removed the "```diff" stop sequence so it doesn't accidentally cut off our mermaid block
-      stop_sequences: ["\nNote", "\nHowever", "\nThe final", "\nGiven", "\nStep"],
+  // If the model ignores the stop sequence and still writes "Let me know..."
+  const noisePhrases = ["Let me know", "I hope this", "Please feel free", "Overall,"];
+  noisePhrases.forEach(phrase => {
+    if (text.includes(phrase)) {
+      text = text.split(phrase)[0].trim();
     }
   });
 
-  let text = response.result?.results?.[0]?.generated_text;
-  if (!text) throw new Error("Watsonx returned no text");
+ // Extract the Mermaid block
+ const mermaidMatch = text.match(/```mermaid\n([\s\S]*?)\n```/);
+ let mermaidCode = mermaidMatch ? mermaidMatch[1].trim() : "";
+ 
+ // THE SANITIZER: If the AI wrote a sentence instead of a diagram, force a fallback diagram
+ const isValidDiagram = mermaidCode.startsWith("graph") || mermaidCode.startsWith("flowchart") || mermaidCode.startsWith("sequenceDiagram");
+ 
+ if (!isValidDiagram) {
+   mermaidCode = `graph TD
+   A[Code Analysis] --> B[No complex architecture detected]
+   style B stroke-dasharray: 5 5`;
+ }
 
-  // Safely extract the Mermaid block and the Summary text
-  const mermaidMatch = text.match(/```mermaid\n([\s\S]*?)\n```/);
-  const mermaidCode = mermaidMatch ? mermaidMatch[1].trim() : "flowchart LR\n  A[No diagram available]";
-  const summaryText = mermaidMatch ? text.replace(mermaidMatch[0], "").trim() : text.trim();
+ // Scrub the mermaid block from the summary text
+ const summaryText = text.replace(/```mermaid[\s\S]*?```/g, "").trim();
 
-  return {
-    summary: summaryText,
-    mermaid: mermaidCode,
-  };
+ return {
+   summary: summaryText,
+   mermaid: mermaidCode,
+ };
 }
