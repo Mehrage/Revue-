@@ -30,6 +30,14 @@ export function MermaidChart({ chart }: { chart: string }) {
         
         // In v11, mermaid.render is strictly async and returns an object { svg }
         const { svg: renderedSvg } = await mermaid.render(id, chart);
+
+          // Force the SVG to fit its container
+          const sanitized = renderedSvg
+            .replace(/width="[^"]*"/, 'width="100%"')
+            .replace(/height="[^"]*"/, 'height="100%"')
+            .replace(/style="[^"]*max-width:[^"]*"/, '')
+
+          setSvg(sanitized);
         
         setSvg(renderedSvg);
         setError(false);
