@@ -40,6 +40,17 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
+model PrReview {
+  id        String   @id @default(cuid())
+  repoId    String
+  prNumber  Int
+  content   String   // Stores the AI summary
+  graph     String?  // Stores the Mermaid code
+  createdAt DateTime @default(now())
+
+  @@unique([repoId, prNumber]) // Prevents duplicate entries for the same PR
+}
+
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique

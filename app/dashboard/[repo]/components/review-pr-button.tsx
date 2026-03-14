@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import { ChevronRight, Loader2, RefreshCw, Sparkles } from "lucide-react";
-import { MermaidChart } from "./mermaid-chart"; 
+import { ChevronRight, Loader2 } from "lucide-react";
+import { MermaidChart } from "./mermaid-chart";
 
 const GOLD = "#c4994a";
 const GOLD_DIM = "rgba(196,153,74,0.08)";
@@ -11,7 +11,6 @@ type Props = {
   owner: string;
   repo: string;
   prNumber: number;
-  alreadyReviewed?: boolean; // <-- Add this new prop
 };
 
 function extractMermaid(text: string) {
@@ -25,7 +24,7 @@ function extractMermaid(text: string) {
   return { cleanText: text, mermaidCode: null };
 }
 
-export function ReviewPrButton({ owner, repo, prNumber, alreadyReviewed }: Props) {
+export function ReviewPrButton({ owner, repo, prNumber }: Props) {
   const [loading, setLoading] = useState(false);
   const [review, setReview] = useState<{ text: string; graph: string | null } | null>(null);
 
@@ -39,7 +38,7 @@ export function ReviewPrButton({ owner, repo, prNumber, alreadyReviewed }: Props
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Review failed");
-      
+
       const parsed = extractMermaid(data.content);
       setReview({ text: parsed.cleanText, graph: parsed.mermaidCode });
     } catch (err) {
@@ -51,16 +50,7 @@ export function ReviewPrButton({ owner, repo, prNumber, alreadyReviewed }: Props
   }
 
   return (
-    // Update the wrapper to handle the side-by-side layout when closed
     <div className={review ? "w-full basis-full mt-4" : "shrink-0 ml-auto flex items-center gap-4"}>
-      
-      {/* Show the Reviewed badge here if it's already been reviewed and the box is closed */}
-      {!review && alreadyReviewed && (
-        <div className="flex items-center gap-1.5 text-xs font-medium" style={{ color: "rgba(52,211,153,0.5)" }}>
-          <Sparkles className="w-3 h-3" />Reviewed
-        </div>
-      )}
-
       {!review && (
         <button
           onClick={handleClick}
@@ -69,11 +59,13 @@ export function ReviewPrButton({ owner, repo, prNumber, alreadyReviewed }: Props
           style={{ padding: "6px 12px", background: GOLD_DIM, border: `1px solid ${GOLD_BORDER}`, color: GOLD }}
         >
           {loading ? (
-            <><Loader2 className="w-3 h-3 animate-spin" /> {alreadyReviewed ? "Regenerating…" : "Reviewing…"}</>
+            <>
+              <Loader2 className="w-3 h-3 animate-spin" /> Reviewing…
+            </>
           ) : (
             <>
-              {alreadyReviewed ? "Regenerate" : "Review"}
-              {alreadyReviewed ? <RefreshCw className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+              Review
+              <ChevronRight className="w-3 h-3" />
             </>
           )}
         </button>

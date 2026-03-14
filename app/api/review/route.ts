@@ -10,7 +10,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let body: { owner: string; repo: string; prNumber: number };
+  let body: { owner: string; repo: string; prNumber: number; regenerate?: boolean };
+  
   try {
     body = await request.json();
   } catch {
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { owner, repo, prNumber } = body;
+  const { owner, repo, prNumber, regenerate } = body;
   if (!owner || !repo || !prNumber) {
     return NextResponse.json(
       { error: "Missing owner, repo, or prNumber" },
@@ -61,49 +62,48 @@ export async function POST(request: Request) {
         ? diffResponse.data
         : String(diffResponse.data);
 
-          // Check if review already exists
-      const existing = await prisma.review.findFirst({
-        where: {
-          userId: session.user.id,
-          repoOwner: owner,
-          repoName: repo,
-          prNumber,
-        },
-        orderBy: { createdAt: "desc" },
-      })
-
-      if (existing) {
-        return NextResponse.json({
-          ok: true,
-          reviewId: existing.id,
-          content: existing.content,
-        })
-      }
-
-      const result = await generateReview({
-        diff,
-        prTitle: pr.title,
-        prBody: pr.body,
-      })
-      const review = await prisma.review.create({
-        data: {
-          userId: session.user.id,
-          repoOwner: owner,
-          repoName: repo,
-          prNumber,
-          prTitle: pr.title,
-          prUrl: pr.html_url ?? "",
-          content: result.summary,
           
-        },
+    const existing = await prisma.review.findFirst({
+      where: {
+        userId: session.user.id,
+        repoOwner: owner,
+        repoName: repo,
+        prNumber,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    if (existing && !regenerate) {
+      return NextResponse.json({
+        ok: true,
+        reviewId: existing.id,
+        content: existing.content,
       });
+    }
+
+    const result = await generateReview({
+      diff,
+      prTitle: pr.title,
+      prBody: pr.body,
+    });
+
+    const review = await prisma.review.create({
+      data: {
+        userId: session.user.id,
+        repoOwner: owner,
+        repoName: repo,
+        prNumber,
+        prTitle: pr.title,
+        prUrl: pr.html_url ?? "",
+        content: result.summary,
+      },
+    });
 
     return NextResponse.json({
       ok: true,
       reviewId: review.id,
       content: review.content,
-      
-    })
+    });
   } catch (err) {
     console.error("Review API error:", err);
     const message = err instanceof Error ? err.message : "Review failed";

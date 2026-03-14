@@ -46,15 +46,25 @@ export default async function RepoDashboardPage({ params }: { params: Promise<{ 
     state: "open",
   })
 
-  const prs = pulls.map((pr) => ({
-    id: pr.id,
-    number: pr.number,
-    title: pr.title,
-    branch: pr.head.ref,
-    updatedAt: new Date(pr.updated_at).toLocaleDateString(),
-    labels: pr.labels.map((l) => l.name ?? "chore"),
-    reviewed: false,
-  }))
+  
+      const dbReviews = await prisma.review.findMany({
+        where: { 
+          repoName: repoName,
+          userId: session.user?.id 
+        }
+      })
+
+      
+      const prs = pulls.map((pr) => ({
+        id: pr.id,
+        number: pr.number,
+        title: pr.title,
+        branch: pr.head.ref,
+        updatedAt: new Date(pr.updated_at).toLocaleDateString(),
+        labels: pr.labels.map((l) => l.name ?? "chore"),
+        
+        reviewed: dbReviews.some(rev => rev.prNumber === pr.number),
+      }))
 
   const pendingCount = prs.filter((p) => !p.reviewed).length
   const reviewedCount = prs.filter((p) => p.reviewed).length
