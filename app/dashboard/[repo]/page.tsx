@@ -147,7 +147,7 @@ export default async function RepoDashboardPage({ params }: { params: Promise<{ 
         </div>
 
         <div className="flex-1 overflow-y-auto">
-        <div className="w-full px-8 py-8 space-y-8 relative overflow-hidden">
+        <div className="max-w-[1600px] w-full mx-auto px-8 py-8 space-y-8 relative">
             <div>
               <h1 className="text-2xl font-semibold tracking-tight text-[#eceef6]">{repoName}</h1>
               <p className="text-sm mt-1" style={{ color: "#52556a" }}>{pendingCount} pending review · {reviewedCount} reviewed</p>
@@ -156,59 +156,53 @@ export default async function RepoDashboardPage({ params }: { params: Promise<{ 
             <div className="space-y-2 w-full overflow-hidden">
               {prs.length === 0 ? (
                 <p className="text-sm" style={{ color: "#52556a" }}>No open pull requests for this repo.</p>
-              ) : prs.map((pr) => {
-                const label = pr.labels[0]
-                const style = LABEL_STYLES[label] ?? LABEL_STYLES.chore
-                
-                return (
-                  <div key={pr.id} className="flex flex-col px-5 py-4 rounded-xl transition-all duration-150 w-full min-w-0 overflow-hidden"
-                    style={{ border: "1px solid rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.018)" }}>
-
-                    {/* Row 1: The PR Header Info & Actions */}
-                    <div className="flex flex-wrap items-center gap-4 min-w-0">
-                      <div className="shrink-0">
-                        {pr.reviewed
-                          ? <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                          : <Circle className="w-4 h-4" style={{ color: "#2a2d3a" }} />}
-                      </div>
-                      
-                      <div className="flex-1 min-w-0 space-y-2">
-                        <div className="flex items-center gap-2.5">
-                          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${style.dot}`} />
-                          <p className="text-sm font-medium truncate text-[#c0c3d4]">{pr.title}</p>
-                          <span className={`shrink-0 text-[10px] px-2 py-0.5 rounded-full font-medium ${style.bg} ${style.text}`}>{label}</span>
-                        </div>
-                        <div className="flex items-center gap-2.5 text-xs" style={{ color: "#3a3d50" }}>
-                          <span className="font-mono">#{pr.number}</span>
-                          <span>·</span>
-                          <span className="font-mono">{pr.branch}</span>
-                          <span>·</span>
-                          <div className="flex items-center gap-1"><Clock className="w-3 h-3" />{pr.updatedAt}</div>
-                        </div>
-                      </div>
-                      
-                      {/* Action Area: Show Delete if reviewed, else show Review button */}
-                      <div className="shrink-0 ml-auto flex items-center gap-2">
+              ) : (
+                prs.map((pr) => (
+                <div 
+                  key={pr.id} 
+                  className="flex flex-col w-full p-5 rounded-xl border border-white/5 bg-white/[0.018] overflow-hidden"
+                  >
+            
+                  {/* --- CARD HEADER --- */}
+                  <div className="flex items-start justify-between w-full border-b border-white/5 pb-4 mb-4">
+                    {/* Left: PR Info */}
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2">
                         {pr.reviewed ? (
-                          <DeleteReviewButton prNumber={pr.number} repoName={repoName} />
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                         ) : (
-                          <ReviewPrButton owner={owner} repo={repoName} prNumber={pr.number} />
+                          <Circle className="w-4 h-4 text-[#2a2d3a]" />
                         )}
+                        <h3 className="text-sm font-medium text-[#e6e8f0]">{pr.title}</h3>
                       </div>
+                      <p className="text-xs text-[#52556a] pl-6">
+                        #{pr.number} · {pr.branch} · {pr.updatedAt}
+                      </p>
                     </div>
-
-                    {/* Row 2: The Accordion (Only appears if reviewed) */}
-                    {pr.reviewed && (
-                      <div className="w-full mt-2">
-                        <ReviewAccordion 
-                          content={pr.reviewContent} 
-                          mermaid={pr.reviewMermaid} 
-                        />
-                      </div>
-                    )}
+              
+                    {/* Right: Action Button */}
+                    <div className="shrink-0">
+                      {pr.reviewed ? (
+                        <DeleteReviewButton prNumber={pr.number} repoName={repoName} />
+                      ) : (
+                        <ReviewPrButton owner={owner} repo={repoName} prNumber={pr.number} />
+                      )}
+                    </div>
                   </div>
-                )
-              })}
+              
+                 {/* --- CARD CONTENT (AI Review) --- */}
+                 {pr.reviewed && (
+                    <div className="w-full">
+                      <ReviewAccordion 
+                        content={pr.reviewContent} 
+                        mermaid={pr.reviewMermaid} 
+                      />
+                    </div>
+                  )} 
+                </div>
+              ))
+            )} 
+            
             </div>
           </div>
         </div>
