@@ -96,6 +96,7 @@ export async function POST(request: Request) {
         prTitle: pr.title,
         prUrl: pr.html_url ?? "",
         content: result.summary,
+        diff: diff, 
       },
     });
     

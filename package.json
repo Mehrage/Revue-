@@ -23,6 +23,7 @@
     "mermaid": "^11.13.0",
     "next": "^16.1.6",
     "next-auth": "^5.0.0-beta.30",
+    "octokit": "^5.0.5",
     "octokit-fetch-all-repos": "^2.0.3",
     "openai": "^6.29.0",
     "pg": "^8.18.0",

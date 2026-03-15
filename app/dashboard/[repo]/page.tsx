@@ -55,7 +55,6 @@ export default async function RepoDashboardPage({ params }: { params: Promise<{ 
 
       
       const prs = pulls.map((pr) => {
-        // Find the full review object from the database
         const dbReview = dbReviews.find(rev => rev.prNumber === pr.number);
       
         return {
@@ -68,6 +67,7 @@ export default async function RepoDashboardPage({ params }: { params: Promise<{ 
           
           reviewed: !!dbReview,
           reviewContent: dbReview?.content || "",
+          reviewDiff: dbReview?.diff || "", 
         }
       })
 
@@ -145,7 +145,7 @@ export default async function RepoDashboardPage({ params }: { params: Promise<{ 
         </div>
 
         <div className="flex-1 overflow-y-auto">
-        <div className="max-w-[1600px] w-full mx-auto px-8 py-8 space-y-8 relative">
+          <div className="max-w-[1600px] w-full mx-auto px-8 py-8 space-y-8 relative">
             <div>
               <h1 className="text-2xl font-semibold tracking-tight text-[#eceef6]">{repoName}</h1>
               <p className="text-sm mt-1" style={{ color: "#52556a" }}>{pendingCount} pending review · {reviewedCount} reviewed</p>
@@ -156,50 +156,50 @@ export default async function RepoDashboardPage({ params }: { params: Promise<{ 
                 <p className="text-sm" style={{ color: "#52556a" }}>No open pull requests for this repo.</p>
               ) : (
                 prs.map((pr) => (
-                <div 
-                  key={pr.id} 
-                  className="flex flex-col w-full p-5 rounded-xl border border-white/5 bg-white/[0.018] overflow-hidden"
+                  <div 
+                    key={pr.id} 
+                    className="flex flex-col w-full p-5 rounded-xl border border-white/5 bg-white/[0.018] overflow-hidden"
                   >
-            
-                  {/* --- CARD HEADER --- */}
-                  <div className="flex items-start justify-between w-full border-b border-white/5 pb-4 mb-4">
-                    {/* Left: PR Info */}
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-2">
-                        {pr.reviewed ? (
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                        ) : (
-                          <Circle className="w-4 h-4 text-[#2a2d3a]" />
-                        )}
-                        <h3 className="text-sm font-medium text-[#e6e8f0]">{pr.title}</h3>
+                    {/* --- CARD HEADER --- */}
+                    <div className="flex items-start justify-between w-full border-b border-white/5 pb-4 mb-4">
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                          {pr.reviewed ? (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                          ) : (
+                            <Circle className="w-4 h-4 text-[#2a2d3a]" />
+                          )}
+                          <h3 className="text-sm font-medium text-[#e6e8f0]">{pr.title}</h3>
+                        </div>
+                        <p className="text-xs text-[#52556a] pl-6">
+                          #{pr.number} · {pr.branch} · {pr.updatedAt}
+                        </p>
                       </div>
-                      <p className="text-xs text-[#52556a] pl-6">
-                        #{pr.number} · {pr.branch} · {pr.updatedAt}
-                      </p>
+                
+                      <div className="shrink-0">
+                        {pr.reviewed ? (
+                          <DeleteReviewButton prNumber={pr.number} repoName={repoName} />
+                        ) : (
+                          <ReviewPrButton owner={owner} repo={repoName} prNumber={pr.number} />
+                        )}
+                      </div>
                     </div>
-              
-                    {/* Right: Action Button */}
-                    <div className="shrink-0">
-                      {pr.reviewed ? (
-                        <DeleteReviewButton prNumber={pr.number} repoName={repoName} />
-                      ) : (
-                        <ReviewPrButton owner={owner} repo={repoName} prNumber={pr.number} />
-                      )}
-                    </div>
+                
+                    {/* --- CARD CONTENT (AI Review) --- */}
+                    {pr.reviewed && (
+                      <div className="w-full">
+                        <ReviewAccordion 
+                          content={pr.reviewContent} 
+                          diffCode={pr.reviewDiff} 
+                          repoOwner={owner} 
+                          repoName={repoName}
+                          prNumber={pr.number}
+                        />
+                      </div>
+                    )}
                   </div>
-              
-                 {/* --- CARD CONTENT (AI Review) --- */}
-                 {pr.reviewed && (
-                    <div className="w-full">
-                      <ReviewAccordion 
-                        content={pr.reviewContent} 
-                      />
-                    </div>
-                  )} 
-                </div>
-              ))
-            )} 
-            
+                )) // <-- This closing tag was missing!
+              )}
             </div>
           </div>
         </div>

@@ -23,10 +23,11 @@ Analyze the provided code diff and generate a JSON object exactly matching this 
 {
   "summary": "A concise 2-3 sentence summary of what these code changes actually do.",
   "impactScore": "Low", 
-  "failureRisk": 15, 
-  "bugs": [
-    "List any security flaws, bugs, or logic errors here",
-    "Keep them to short, actionable sentences"
+  "suggestions": [
+    {
+      "issue": "A short explanation of the bug or security flaw.",
+      "codeSnippet": "The exact, corrected code block to fix the issue. Leave this as an empty string if no code change is needed."
+    }
   ]
 }`;
 
@@ -45,7 +46,5 @@ Analyze the provided code diff and generate a JSON object exactly matching this 
   let text = response.choices[0]?.message?.content || "";
   if (!text) throw new Error("The model returned no text");
 
-  return {
-    summary: text.trim(),
-  };
+  return { summary: text.trim() };
 }

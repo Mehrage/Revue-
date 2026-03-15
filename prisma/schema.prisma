@@ -71,16 +71,15 @@ model VerificationToken {
 model Review {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   repoOwner String
   repoName  String
   prNumber  Int
   prTitle   String
   prUrl     String
-  content   String   @db.Text
+  content   String
+  diff      String?  // <-- This is the crucial line we added
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-
-  @@index([userId])
-  @@index([repoOwner, repoName, prNumber])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
