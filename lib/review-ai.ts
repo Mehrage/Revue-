@@ -8,7 +8,6 @@ export type ReviewInput = {
 
 export type ReviewOutput = {
   summary: string;
-  mermaid: string;
 };
 
 const client = new OpenAI({
@@ -21,7 +20,6 @@ export async function generateReview(input: ReviewInput): Promise<ReviewOutput> 
 - NO greetings or conversational text. 
 - BE EXTREMELY CONCISE. You are limited to ONE short bullet point per category.
 - If a category has no issues, write "None."
-- STOP immediately after the closing \`\`\` of the mermaid diagram.
 
 Template:
 - Bugs: [Max 1 short sentence]
@@ -29,11 +27,7 @@ Template:
 - Style: [Max 1 short sentence]
 - Performance: [Max 1 short sentence]
 - Tests: [Max 1 short sentence]
-- Suggestions: [Max 2 short bullet points]
-
-\`\`\`mermaid
-[diagram]
-\`\`\``;
+- Suggestions: [Max 2 short bullet points]`;
 
   const userPrompt = `PR: ${input.prTitle}\nDiff:\n${input.diff.slice(0, 50000)}`;
 
@@ -60,24 +54,7 @@ Template:
     }
   });
 
- // Extract the Mermaid block
- const mermaidMatch = text.match(/```mermaid\n([\s\S]*?)\n```/);
- let mermaidCode = mermaidMatch ? mermaidMatch[1].trim() : "";
- 
- // THE SANITIZER: If the AI wrote a sentence instead of a diagram, force a fallback diagram
- const isValidDiagram = mermaidCode.startsWith("graph") || mermaidCode.startsWith("flowchart") || mermaidCode.startsWith("sequenceDiagram");
- 
- if (!isValidDiagram) {
-   mermaidCode = `graph TD
-   A[Code Analysis] --> B[No complex architecture detected]
-   style B stroke-dasharray: 5 5`;
- }
-
- // Scrub the mermaid block from the summary text
- const summaryText = text.replace(/```mermaid[\s\S]*?```/g, "").trim();
-
- return {
-   summary: summaryText,
-   mermaid: mermaidCode,
- };
+  return {
+    summary: text.trim(),
+  };
 }

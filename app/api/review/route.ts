@@ -78,7 +78,6 @@ export async function POST(request: Request) {
         ok: true,
         reviewId: existing.id,
         content: existing.content,
-        mermaid: existing.mermaid,
       });
     }
 
@@ -97,7 +96,6 @@ export async function POST(request: Request) {
         prTitle: pr.title,
         prUrl: pr.html_url ?? "",
         content: result.summary,
-        mermaid: result.mermaid,
       },
     });
     
@@ -105,7 +103,6 @@ export async function POST(request: Request) {
       ok: true,
       reviewId: review.id,
       content: review.content,
-      mermaid: review.mermaid,
     });
     
   } catch (err) {

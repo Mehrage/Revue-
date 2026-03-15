@@ -2,13 +2,12 @@
 
 import { useState } from "react"
 import { Sparkles, ChevronDown, ChevronUp } from "lucide-react"
-import { MermaidChart } from "./mermaid-chart"
 
 const GOLD = "#c4994a"
 const GOLD_DIM = "rgba(196,153,74,0.08)"
 const GOLD_BORDER = "rgba(196,153,74,0.22)"
 
-export default function ReviewAccordion({ content, mermaid }: { content: string; mermaid: string }) {
+export default function ReviewAccordion({ content }: { content: string }) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -32,7 +31,7 @@ export default function ReviewAccordion({ content, mermaid }: { content: string;
           <div className="flex w-full min-h-[350px] gap-5 p-5 rounded-xl"
             style={{ background: "rgba(0,0,0,0.15)", border: "1px solid rgba(255,255,255,0.03)" }}>
 
-            {/* Left — Summary */}
+            {/* Summary */}
             <div className="flex-1 flex flex-col rounded-xl p-5 overflow-hidden"
               style={{ border: "1px solid rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.018)" }}>
               <h3 style={{ color: GOLD }} className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-3">AI Summary</h3>
@@ -41,7 +40,7 @@ export default function ReviewAccordion({ content, mermaid }: { content: string;
               </div>
             </div>
 
-            {/* Middle — Steps */}
+            {/* Steps */}
             <div className="w-28 shrink-0 flex flex-col justify-center gap-2.5">
               {["Bugs", "Security", "Style", "Performance", "Complete"].map((step, i) => (
                 <div key={step}
@@ -54,17 +53,6 @@ export default function ReviewAccordion({ content, mermaid }: { content: string;
                   {step}
                 </div>
               ))}
-            </div>
-
-            {/* Right — Mermaid */}
-            <div className="flex-1 flex flex-col rounded-xl p-5 overflow-hidden"
-              style={{ border: "1px solid rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.018)" }}>
-              <h3 style={{ color: GOLD }} className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-3">Code Flow</h3>
-              <div className="flex-1 flex items-center justify-center rounded-lg border border-dashed border-white/10 bg-black/20 text-xs text-[#52556a] overflow-auto">
-                {mermaid
-                  ? <MermaidChart chart={mermaid} />
-                  : "No visual architecture changes detected."}
-              </div>
             </div>
           </div>
         </div>

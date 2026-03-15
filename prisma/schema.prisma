@@ -44,11 +44,10 @@ model PrReview {
   id        String   @id @default(cuid())
   repoId    String
   prNumber  Int
-  content   String   // Stores the AI summary
-  graph     String?  // Stores the Mermaid code
+  content   String
   createdAt DateTime @default(now())
 
-  @@unique([repoId, prNumber]) // Prevents duplicate entries for the same PR
+  @@unique([repoId, prNumber])
 }
 
 model Session {
@@ -79,7 +78,6 @@ model Review {
   prTitle   String
   prUrl     String
   content   String   @db.Text
-  mermaid   String?  @db.Text
   createdAt DateTime @default(now())
 
 

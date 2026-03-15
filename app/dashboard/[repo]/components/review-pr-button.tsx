@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { ChevronRight, Loader2 } from "lucide-react";
-import { MermaidChart } from "./mermaid-chart";
 
 const GOLD = "#c4994a";
 const GOLD_DIM = "rgba(196,153,74,0.08)";
@@ -15,7 +14,7 @@ type Props = {
 
 export function ReviewPrButton({ owner, repo, prNumber }: Props) {
   const [loading, setLoading] = useState(false);
-  const [review, setReview] = useState<{ text: string; graph: string | null } | null>(null);
+  const [review, setReview] = useState<{ text: string } | null>(null);
 
   async function handleClick() {
     setLoading(true);
@@ -27,7 +26,7 @@ export function ReviewPrButton({ owner, repo, prNumber }: Props) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Review failed");
-      setReview({ text: data.content, graph: data.mermaid ?? null });
+      setReview({ text: data.content });
     } catch (err) {
       console.error(err);
       alert(err instanceof Error ? err.message : "Review failed");
@@ -58,7 +57,7 @@ export function ReviewPrButton({ owner, repo, prNumber }: Props) {
           <div className="flex w-full min-h-[250px] gap-3 p-3 rounded-xl"
             style={{ background: "rgba(0,0,0,0.15)", border: "1px solid rgba(255,255,255,0.03)" }}>
 
-            {/* Left — Summary */}
+            {/* Summary */}
             <div className="flex-1 flex flex-col rounded-xl p-5 overflow-hidden"
               style={{ border: "1px solid rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.018)" }}>
               <h3 style={{ color: GOLD }} className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-3">AI Summary</h3>
@@ -67,7 +66,7 @@ export function ReviewPrButton({ owner, repo, prNumber }: Props) {
               </div>
             </div>
 
-            {/* Middle — Steps */}
+            {/* Steps */}
             <div className="w-20 shrink-0 flex flex-col justify-center gap-1.5">
               {["Bugs", "Security", "Style", "Performance", "Complete"].map((step, i) => (
                 <div key={step}
@@ -80,17 +79,6 @@ export function ReviewPrButton({ owner, repo, prNumber }: Props) {
                   {step}
                 </div>
               ))}
-            </div>
-
-            {/* Right — Mermaid */}
-            <div className="flex-1 flex flex-col rounded-xl p-5 overflow-hidden"
-              style={{ border: "1px solid rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.018)" }}>
-              <h3 style={{ color: GOLD }} className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-3">Code Flow</h3>
-              <div className="flex-1 flex items-center justify-center rounded-lg border border-dashed border-white/10 bg-black/20 text-xs text-[#52556a] overflow-auto">
-                {review.graph
-                  ? <MermaidChart chart={review.graph} />
-                  : "No visual architecture changes detected."}
-              </div>
             </div>
           </div>
 

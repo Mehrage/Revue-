@@ -66,10 +66,8 @@ export default async function RepoDashboardPage({ params }: { params: Promise<{ 
           updatedAt: new Date(pr.updated_at).toLocaleDateString(),
           labels: pr.labels.map((l) => l.name ?? "chore"),
           
-          // Pass the actual data along
           reviewed: !!dbReview,
           reviewContent: dbReview?.content || "",
-          reviewMermaid: dbReview?.mermaid || "",
         }
       })
 
@@ -195,7 +193,6 @@ export default async function RepoDashboardPage({ params }: { params: Promise<{ 
                     <div className="w-full">
                       <ReviewAccordion 
                         content={pr.reviewContent} 
-                        mermaid={pr.reviewMermaid} 
                       />
                     </div>
                   )} 
