@@ -82,11 +82,18 @@ export async function POST(request: Request) {
       });
     }
 
+      const changedFiles = diff
+    .split("\n")
+    .filter((line) => line.startsWith("diff --git"))
+    .map((line) => line.split(" b/")[1])
+
     const result = await generateReview({
       diff,
       prTitle: pr.title,
-      prBody: pr.body,
-    });
+      prBody: pr.body ?? "",
+      changedFiles,
+      repoName: repo,
+    })
 
     const review = await prisma.review.create({
       data: {

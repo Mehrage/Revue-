@@ -15,7 +15,11 @@ type Props = {
 
 export function ReviewPrButton({ owner, repo, prNumber }: Props) {
   const [loading, setLoading] = useState(false);
-  const [review, setReview] = useState<{ text: string; graph: string | null } | null>(null);
+  const [review, setReview] = useState<{ 
+    text: string; 
+    graph: string | null; 
+    impactScore?: number 
+  } | null>(null);
 
   async function handleClick() {
     setLoading(true);
@@ -27,7 +31,7 @@ export function ReviewPrButton({ owner, repo, prNumber }: Props) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Review failed");
-      setReview({ text: data.content, graph: data.mermaid ?? null });
+      setReview({ text: data.summary, graph: data.mermaid ?? null, impactScore: data.impactScore });
     } catch (err) {
       console.error(err);
       alert(err instanceof Error ? err.message : "Review failed");
@@ -37,7 +41,7 @@ export function ReviewPrButton({ owner, repo, prNumber }: Props) {
   }
 
   return (
-    <div className={review ? "w-full basis-full mt-4" : "shrink-0 ml-auto flex items-center gap-4"}>
+    <div className={review ? "w-full mt-4" : "shrink-0 ml-auto flex items-center gap-4"}>
       {!review && (
         <button
           onClick={handleClick}
@@ -61,7 +65,24 @@ export function ReviewPrButton({ owner, repo, prNumber }: Props) {
             {/* Left — Summary */}
             <div className="flex-1 flex flex-col rounded-xl p-5 overflow-hidden"
               style={{ border: "1px solid rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.018)" }}>
-              <h3 style={{ color: GOLD }} className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-3">AI Summary</h3>
+              <div className="flex items-center justify-between mb-3">
+              <h3 style={{ color: GOLD }} className="text-[10px] font-semibold uppercase tracking-[0.1em]">AI Summary</h3>
+              {review.impactScore && (
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-medium"
+                  style={{
+                    background: review.impactScore >= 7 ? "rgba(239,68,68,0.1)" :
+                                review.impactScore >= 4 ? "rgba(245,158,11,0.1)" :
+                                "rgba(52,211,153,0.1)",
+                    color: review.impactScore >= 7 ? "#ef4444" :
+                          review.impactScore >= 4 ? "#f59e0b" : "#34d399",
+                    border: `1px solid ${review.impactScore >= 7 ? "rgba(239,68,68,0.2)" :
+                                          review.impactScore >= 4 ? "rgba(245,158,11,0.2)" :
+                                          "rgba(52,211,153,0.2)"}`
+                  }}>
+                  Impact: {review.impactScore}/10
+                </span>
+              )}
+            </div>
               <div className="flex-1 overflow-y-auto text-[#c0c3d4] text-xs leading-relaxed whitespace-pre-wrap break-words pr-2">
                 {review.text}
               </div>

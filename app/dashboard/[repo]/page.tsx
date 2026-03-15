@@ -159,9 +159,10 @@ export default async function RepoDashboardPage({ params }: { params: Promise<{ 
               ) : (
                 prs.map((pr) => (
                 <div 
-                  key={pr.id} 
-                  className="flex flex-col w-full p-5 rounded-xl border border-white/5 bg-white/[0.018] overflow-hidden"
-                  >
+    
+                key={pr.id} 
+                className="flex flex-col w-full p-5 rounded-xl border border-white/5 bg-white/[0.018]"
+              >
             
                   {/* --- CARD HEADER --- */}
                   <div className="flex items-start justify-between w-full border-b border-white/5 pb-4 mb-4">
