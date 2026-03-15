@@ -1,5 +1,7 @@
 # Revue
 
+PLEASE JUDGE MAIN
+
 AI-powered pull request reviewer. Connect your GitHub repositories and get instant, automated code reviews powered by Claude.
 (took me so long)
 
