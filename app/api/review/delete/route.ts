@@ -1,25 +1,28 @@
+import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { NextResponse } from "next/server"
 
-export async function DELETE(request: Request) {
-  const session = await auth()
-  if (!session?.user?.id) return new NextResponse("Unauthorized", { status: 401 })
-
+export async function DELETE(req: Request) {
   try {
-    const { prNumber, repoName } = await request.json()
+    const session = await auth()
+    if (!session?.user?.id) {
+      return new NextResponse("Unauthorized", { status: 401 })
+    }
 
-    // This removes the specific review for this user and PR
+    const { repoName, prNumber } = await req.json()
+
+    // MAGIC FIX: Use deleteMany to wipe every single draft for this PR
     await prisma.review.deleteMany({
       where: {
         userId: session.user.id,
-        prNumber: prNumber,
         repoName: repoName,
+        prNumber: prNumber,
       },
     })
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    return NextResponse.json({ error: "Failed to delete" }, { status: 500 })
+    console.error("Failed to delete reviews:", error)
+    return new NextResponse("Internal Server Error", { status: 500 })
   }
 }
