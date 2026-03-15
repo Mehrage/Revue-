@@ -8,7 +8,7 @@ AI-powered pull request reviewer. Connect your GitHub repositories and get insta
 ## Tech Stack
 
 - **Framework** — Next.js 16 (App Router)
-- **Auth** — Auth.js v5 with GitHub OAuth
+- **Auth** — Auth.js v5 with GitHub OAuth - make sure it has repo permissions !!!!
 - **Database** — PostgreSQL via Supabase
 - **ORM** — Prisma 7
 - **AI** — Anthropic Claude (`claude-opus-4-6`) / open AI, Google Gen AI, IBM watson
@@ -41,7 +41,7 @@ AUTH_SECRET=your_auth_secret
 GITHUB_CLIENT_ID=your_github_oauth_app_client_id
 GITHUB_CLIENT_SECRET=your_github_oauth_app_client_secret
 
-ANTHROPIC_API_KEY=your_anthropic_api_key
+ANTHROPIC_API_KEY=your_anthropic_api_key (this was the goal, ANY OTHER KEY WOULD WORK I used the one provided from the announcments OpenAI) 
 ```
 
 #### Connect to Supabase
@@ -81,7 +81,7 @@ npx prisma migrate dev
 npm run dev
 ```
 
-Open [http://localhost:####](http://localhost:####).
+Open [http://localhost:####](http://localhost:####). - whatever number that ends up working for you
 
 ## GitHub OAuth App
 
@@ -91,4 +91,4 @@ Open [http://localhost:####](http://localhost:####).
 4. Set **Callback URL** to `http://localhost:####/api/auth/callback/github`
 5. Copy the Client ID and Client Secret into your `.env`
 
-
+Revue requests the 'repo' scope during login to securely access your pull requests and post AI suggestions on your behalf. (by your approval ofc)
