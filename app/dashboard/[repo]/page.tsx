@@ -11,6 +11,7 @@ import {
 import { ReviewPrButton } from "./components/review-pr-button"
 import ReviewAccordion from "./components/review-accordion"
 import { DeleteReviewButton } from "./components/delete-button"
+import  { ReviewStatusBadge } from "./components/review-status-page"
 
 const GOLD = "#c4994a"
 const GOLD_DIM = "rgba(196,153,74,0.08)"
@@ -195,6 +196,7 @@ export default async function RepoDashboardPage({ params }: { params: Promise<{ 
                           repoName={repoName}
                           prNumber={pr.number}
                         />
+                        <ReviewStatusBadge prNumber={pr.number} repoName={repoName} />
                       </div>
                     )}
                   </div>
