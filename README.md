@@ -79,14 +79,14 @@ npx prisma migrate dev
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:####](http://localhost:####).
 
 ## GitHub OAuth App
 
 1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
 2. Create a new OAuth App
-3. Set **Homepage URL** to `http://localhost:3000`
-4. Set **Callback URL** to `http://localhost:3000/api/auth/callback/github`
+3. Set **Homepage URL** to `http://localhost:####`
+4. Set **Callback URL** to `http://localhost:####/api/auth/callback/github`
 5. Copy the Client ID and Client Secret into your `.env`
 
 
