@@ -40,8 +40,10 @@ DATABASE_URL=your_supabase_postgresql_connection_string
 AUTH_SECRET=your_auth_secret
 GITHUB_CLIENT_ID=your_github_oauth_app_client_id
 GITHUB_CLIENT_SECRET=your_github_oauth_app_client_secret
+GITHUB_TOKE=your_github_token
 
-ANTHROPIC_API_KEY=your_anthropic_api_key (this was the goal, ANY OTHER KEY WOULD WORK I used the one provided from the announcments OpenAI) 
+ANTHROPIC_API_KEY=your_anthropic_api_key (this was the goal, ANY OTHER KEY WOULD WORK)
+GEMINI_API_KEY=your_gemini_api_key
 ```
 
 #### Connect to Supabase
