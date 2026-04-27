@@ -1,0 +1,6 @@
+{"sessionId":"455acc","runId":"startup","hypothesisId":"H1","location":"lib/prisma.ts:adapter_init","message":"Initializing Prisma adapter","data":{"hasDatabaseUrl":true,"nodeEnv":"development"},"timestamp":1777260584245}
+{"sessionId":"455acc","runId":"startup","hypothesisId":"H1","location":"lib/prisma.ts:client_init","message":"Prisma client object created","data":{"reusedGlobalClient":false},"timestamp":1777260584311}
+{"sessionId":"455acc","runId":"startup","hypothesisId":"H3","location":"app/page.tsx:home_auth","message":"Home page auth check completed","data":{"hasSession":false,"hasUserId":false},"timestamp":1777260586999}
+{"sessionId":"455acc","runId":"startup","hypothesisId":"H3","location":"app/page.tsx:home_auth","message":"Home page auth check completed","data":{"hasSession":false,"hasUserId":false},"timestamp":1777260603710}
+{"sessionId":"455acc","runId":"startup","hypothesisId":"H1","location":"lib/prisma.ts:adapter_init","message":"Initializing Prisma adapter","data":{"hasDatabaseUrl":true,"nodeEnv":"development"},"timestamp":1777260624026}
+{"sessionId":"455acc","runId":"startup","hypothesisId":"H1","location":"lib/prisma.ts:client_init","message":"Prisma client object created","data":{"reusedGlobalClient":true},"timestamp":1777260624028}
