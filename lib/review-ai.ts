@@ -1,4 +1,4 @@
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export type ReviewInput = {
   diff: string;
@@ -10,10 +10,14 @@ export type ReviewOutput = {
   summary: string;
 };
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || "test", 
-  baseURL: "https://vjioo4r1vyvcozuj.us-east-2.aws.endpoints.huggingface.cloud/v1",
-});
+const geminiApiKey = process.env.GEMINI_API_KEY;
+
+if (!geminiApiKey) {
+  throw new Error("GEMINI_API_KEY is missing. Add it to your .env file.");
+}
+
+const genAI = new GoogleGenerativeAI(geminiApiKey);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export async function generateReview(input: ReviewInput): Promise<ReviewOutput> {
   const systemPrompt = `You are a strict, senior code reviewer analyzing a GitHub Pull Request.
@@ -33,17 +37,15 @@ Analyze the provided code diff and generate a JSON object exactly matching this 
 
   const userPrompt = `PR: ${input.prTitle}\nDiff:\n${input.diff.slice(0, 50000)}`;
 
-  const response = await client.chat.completions.create({
-    model: "openai/gpt-oss-120b", 
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: userPrompt },
-    ],
-    max_tokens: 800,
-    temperature: 0.1,
+  const response = await model.generateContent({
+    contents: [{ role: "user", parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }] }],
+    generationConfig: {
+      temperature: 0.1,
+      maxOutputTokens: 800,
+    },
   });
 
-  let text = response.choices[0]?.message?.content || "";
+  const text = response.response.text();
   if (!text) throw new Error("The model returned no text");
 
   return { summary: text.trim() };
